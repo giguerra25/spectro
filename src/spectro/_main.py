@@ -83,7 +83,7 @@ def check(path, **kwargs):
         if p.suffix in [".mp3", ".wav", ".flac"]:
             _check_file(p, **kwargs)
 
-
+    
 def _check_file(filename, window_length_s: float = 0.05, channel: int = 0):
     track = AudioSegment.from_file(filename)
 
@@ -122,11 +122,13 @@ def _check_file(filename, window_length_s: float = 0.05, channel: int = 0):
     if filename.suffix in [".wav", ".flac"]:
         if f[k] > 19000:
             console.print(f"[green]{filename} seems good.")
+            return f[k]
         else:
             console.print(
                 f"[red]{filename} is WAV, but has max frequency "
                 f"about {f[k]:.0f} Hz. Check with spectro show."
             )
+            return f[k]
     elif filename.suffix == ".mp3":
         mp3_file = MP3(filename)
         bitrate = int(mp3_file.info.bitrate / 1000)
@@ -146,11 +148,15 @@ def _check_file(filename, window_length_s: float = 0.05, channel: int = 0):
 
         if f[k] > expected_max_freq:
             console.print(f"[green]{filename} seems good [{bitrate} kbps].")
+            return f[k]
         else:
             console.print(
                 f"[red]{filename} is MP3 [{bitrate} kbps], but has max frequency "
                 f"about {f[k]:.0f} Hz. Check with speck-show."
             )
+            return f[k]
 
     else:
         console.print(f"[italic]Don't know what to expect for {filename}.")
+        return f[k]
+    
